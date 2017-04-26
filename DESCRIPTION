@@ -1,7 +1,7 @@
 Package: splithalf
 Type: Package
 Title: Calculate Task Split Half Reliability Estimates
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Sam", "Parsons", email = "sam.parsons@psy.ox.ac.uk",
   role = c("aut", "cre"))
 Maintainer: Sam Parsons <sam.parsons@psy.ox.ac.uk>
@@ -21,7 +21,7 @@ URL: http://github.com/sdparsons/splithalf
 BugReports: http://github.com/sdparsons/splithalf
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2017-04-07 09:50:21 UTC; parsonss
+Packaged: 2017-04-26 14:16:00 UTC; parsonss
 Author: Sam Parsons [aut, cre]
 Repository: CRAN
-Date/Publication: 2017-04-07 12:33:43 UTC
+Date/Publication: 2017-04-26 16:26:11 UTC

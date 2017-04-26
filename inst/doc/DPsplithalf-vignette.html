@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sam Parsons" />
 
-<meta name="date" content="2017-04-07" />
+<meta name="date" content="2017-04-26" />
 
 <title>DPsplithalf() Vignette</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">DPsplithalf() Vignette</h1>
 <h4 class="author"><em>Sam Parsons</em></h4>
-<h4 class="date"><em>2017-04-07</em></h4>
+<h4 class="date"><em>2017-04-26</em></h4>
 
 
 
@@ -98,16 +98,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  $ blockcode : Factor w/ 2 levels &quot;block1&quot;,&quot;block2&quot;: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ trialnum  : int  1 2 3 4 5 6 7 8 9 10 ...
 ##  $ congruency: Factor w/ 2 levels &quot;Congruent&quot;,&quot;Incongruent&quot;: 1 2 1 2 1 2 1 2 1 2 ...
-##  $ latency   : num  27.1 24.7 24.2 25 23.3 ...
+##  $ latency   : num  26.8 24 25.6 24.6 27.1 ...
 ##  $ correct   : num  1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(DPdata)</code></pre></div>
 <pre><code>##   subject blockcode trialnum  congruency  latency correct
-## 1       1    block1        1   Congruent 27.10857       1
-## 2       1    block1        2 Incongruent 24.66168       1
-## 3       1    block1        3   Congruent 24.20617       1
-## 4       1    block1        4 Incongruent 24.97494       1
-## 5       1    block1        5   Congruent 23.32984       1
-## 6       1    block1        6 Incongruent 24.80058       1</code></pre>
+## 1       1    block1        1   Congruent 26.81363       1
+## 2       1    block1        2 Incongruent 23.96836       1
+## 3       1    block1        3   Congruent 25.60977       1
+## 4       1    block1        4 Incongruent 24.59269       1
+## 5       1    block1        5   Congruent 27.05541       1
+## 6       1    block1        6 Incongruent 23.61849       1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">is.na</span>(DPdata))</code></pre></div>
 <pre><code>## [1] 0</code></pre>
 <p>In this example, we want to calculate the split-half reliability for block 1 and block 2. We want to use the “random” method to process 5000 iterations of randomly generated splits, and return estimates for both blocks. The function will take a little time to run (the time taken while creating this vignette was 23s).</p>
@@ -122,9 +122,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## [1] &quot;condition block2 complete&quot;
 ## [1] &quot;Calculating split half estimates&quot;
 ## [1] &quot;Split half estimates for 5000 random splits&quot;</code></pre>
-<pre><code>##   condition  N  splithalf spearmanbrown
-## 1    block1 20 -0.9352083     -32.44127
-## 2    block2 20 -0.9396368     -34.95403</code></pre>
+<pre><code>##   condition  N  splithalf spearmanbrown  twoalpha
+## 1    block1 20 -0.9153207     -24.13734 -22.82336
+## 2    block2 20 -0.9259440     -27.94679 -26.40011</code></pre>
 <p>What you see first is the console output. You will be informed as each condition has been processed and at which point the estimates are being calculated. This is purely so the user can keep track of the progress of the function.</p>
 <p>Next, the function output. The data frame returns each condition separately. The N column indicates the number of participants’ data that has been processed, which is important to check as it is an early indication of missing data. The splithalf column is the raw split half estimate, in this case the average of 5000 random splits. The spearmanbrown column returns the spearman-brown corrected reliability estimate. You will quickly note that this estimate is flawed in this example; this is due to the high negative splithalf estimate. This is expected with this randomly simulated data.</p>
 </div>
@@ -135,12 +135,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <pre><code>## [1] 0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">subset</span>(DPdata_missing, DPdata_missing$accuracy ==<span class="st"> </span><span class="dv">0</span>))</code></pre></div>
 <pre><code>##      subject  block trialnumber    trialtype responsetime accuracy
-## 2785      15 block2           1   Congruent1     25.36413        0
-## 2786      15 block2           2 Incongruent2     25.64574        0
-## 2787      15 block2           3   Congruent1     24.67010        0
-## 2788      15 block2           4 Incongruent2     23.43138        0
-## 2789      15 block2           5   Congruent1     25.88791        0
-## 2790      15 block2           6 Incongruent2     24.04770        0</code></pre>
+## 2785      15 block2           1   Congruent1     25.20464        0
+## 2786      15 block2           2 Incongruent2     22.71525        0
+## 2787      15 block2           3   Congruent1     25.76467        0
+## 2788      15 block2           4 Incongruent2     25.06934        0
+## 2789      15 block2           5   Congruent1     25.83860        0
+## 2790      15 block2           6 Incongruent2     22.48173        0</code></pre>
 <p>From the head() data above we can also see that the variable names do not conform to what is needed to run the function. First, we will rename the Congruent and Incongruent trials. The function requires that a “congruency” variable specifies whether the trial is “Congruent” of “Incongruent” (case sensitive). One such method is to run the following. The code searches in the trialtype variable for strings that contain “Incongruent” and returns “Incongruent” if present, and “Congruent” if not. This simple line of script can be adapted to meet most namings. Note, ensure that the name searched for is not present in other conditions, otherwise these will be included too.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DPdata_missing$congruency &lt;-<span class="st"> </span><span class="kw">as.factor</span>(<span class="kw">ifelse</span>(<span class="kw">grepl</span>(<span class="st">&quot;Incongruent&quot;</span>, DPdata_missing$trialtype), <span class="st">&quot;Incongruent&quot;</span>, <span class="st">&quot;Congruent&quot;</span>))
 <span class="kw">str</span>(DPdata_missing$congruency)</code></pre></div>
@@ -172,9 +172,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##           $omitted contains the missing cases</code></pre>
 <pre><code>## [1] &quot;Split half estimates for 5000 random splits&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example2$Estimates</code></pre></div>
-<pre><code>##   condition  N  splithalf spearmanbrown
-## 1    block1 20 -0.9252310     -27.81283
-## 2    block2 19 -0.8940196     -18.98773</code></pre>
+<pre><code>##   condition  N  splithalf spearmanbrown  twoalpha
+## 1    block1 20 -0.9084394     -22.29289 -21.07084
+## 2    block2 19 -0.9222273     -26.78133 -25.19598</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(example2$omitted)</code></pre></div>
 <pre><code>##        condition participant iteration bias1 bias2
 ## 170001    block2          15         1   NaN   NaN
