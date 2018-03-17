@@ -1,7 +1,7 @@
 Package: splithalf
 Type: Package
 Title: Calculate Task Split Half Reliability Estimates
-Version: 0.2.0
+Version: 0.3.1
 Authors@R: person("Sam", "Parsons", email = "sam.parsons@psy.ox.ac.uk",
   role = c("aut", "cre"))
 Maintainer: Sam Parsons <sam.parsons@psy.ox.ac.uk>
@@ -10,8 +10,8 @@ Description: A series of functions to calculate the split
     procedure to process a user defined number of random splits in order to 
     provide a better reliability estimate. The current functions target the dot-
     probe task, however, can be modified for other tasks.
-Depends: R (>= 3.3.2)
-Imports: plyr, stats
+Depends: R (>= 3.3)
+Imports: tidyr, dplyr, stats
 Suggests: testthat, knitr, rmarkdown, tools, ggplot2
 License: GPL-3
 Encoding: UTF-8
@@ -21,7 +21,7 @@ URL: http://github.com/sdparsons/splithalf
 BugReports: http://github.com/sdparsons/splithalf
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2017-04-26 14:16:00 UTC; parsonss
+Packaged: 2018-03-17 13:17:23 UTC; Sam
 Author: Sam Parsons [aut, cre]
 Repository: CRAN
-Date/Publication: 2017-04-26 16:26:11 UTC
+Date/Publication: 2018-03-17 22:40:55 UTC

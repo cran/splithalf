@@ -5,9 +5,10 @@
 \title{Dot-Probe Split Half}
 \usage{
 splithalf(data, RTmintrim = "none", RTmaxtrim = "none", incErrors = FALSE,
-  conditionlist, halftype, no.iterations = 1, var.RT = "latency",
-  var.condition = "blockcode", var.participant = "subject",
-  var.correct = "correct", var.trialnum = "trialnum", removelist = "")
+  conditionlist = FALSE, halftype, no.iterations = 1, var.RT = "latency",
+  var.condition = FALSE, var.participant = "subject",
+  var.correct = "correct", var.trialnum = "trialnum", removelist = "",
+  average = "mean", sdtrim = FALSE)
 }
 \arguments{
 \item{data}{specifies the raw dataset to be processed}
@@ -35,6 +36,10 @@ splithalf(data, RTmintrim = "none", RTmaxtrim = "none", incErrors = FALSE,
 \item{var.trialnum}{specifies the trial number variable}
 
 \item{removelist}{specifies a list of participants to be removed}
+
+\item{average}{allows the user to specify whether mean or median will be used to create the bias index}
+
+\item{sdtrim}{allows the user to trim the data by selected sd (after removal of errors and min/max RTs)}
 }
 \value{
 Returns a data frame containing split-half reliability estimates for each condition specified.

@@ -16,7 +16,15 @@ sum(is.na(DPdata))
 
 ## ------------------------------------------------------------------------
 library(splithalf)
-DPsplithalf(DPdata, conditionlist = c("block1","block2"), halftype = "random", no.iterations = 5000)
+library(dplyr)
+library(tidyr)
+splithalf_diff(DPdata, 
+               conditionlist = c("block1","block2"), 
+               halftype = "random", 
+               no.iterations = 5000,
+               var.compare = "congruency",
+               compare1 = "Congruent",
+               compare2 = "Incongruent")
 
 ## ---- echo = FALSE-------------------------------------------------------
 DPdata2 <- data.frame(subject = rep(1:20, each = (96*2)),
@@ -52,8 +60,17 @@ DPdata_missing$block <- as.factor(ifelse(DPdata_missing$block  == "block1" |
 str(DPdata_missing$block)
 
 ## ------------------------------------------------------------------------
-example2 <- DPsplithalf(DPdata_missing, conditionlist = c("block1","block2"), halftype = "random",                                   no.iterations = 5000, var.condition = "block", var.trialnum = "trialnumber", 
-                        var.RT = "responsetime", var.correct = "accuracy" )
+example2 <- splithalf_diff(DPdata_missing, 
+                        conditionlist = c("block1","block2"), 
+                        halftype = "random",
+                        no.iterations = 50, 
+                        var.condition = "block",
+                        var.trialnum = "trialnumber", 
+                        var.RT = "responsetime", 
+                        var.correct = "accuracy",
+                        var.compare = "congruency",
+                        compare1 = "Congruent",
+                        compare2 = "Incongruent")
 example2$Estimates
 head(example2$omitted)
 
