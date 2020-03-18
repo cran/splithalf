@@ -4,19 +4,32 @@
 \alias{splithalf}
 \title{Internal consistency of task measures via a permutation split-half reliability approach}
 \usage{
-splithalf(data, outcome = "RT", score = "difference",
-  conditionlist = FALSE, halftype = "random", permutations = 5000,
-  var.RT = "latency", var.condition = FALSE,
-  var.participant = "subject", var.trialnum = "trialnum",
-  var.compare = "congruency", compare1 = "Congruent",
-  compare2 = "Incongruent", average = "mean")
+splithalf(
+  data,
+  outcome = "RT",
+  score = "difference",
+  conditionlist = FALSE,
+  halftype = "random",
+  permutations = 5000,
+  var.RT = "latency",
+  var.ACC = "accuracy",
+  var.condition = FALSE,
+  var.participant = "subject",
+  var.trialnum = "trialnum",
+  var.compare = "congruency",
+  compare1 = "Congruent",
+  compare2 = "Incongruent",
+  average = "mean",
+  plot = FALSE,
+  round.to = 2
+)
 }
 \arguments{
 \item{data}{specifies the raw dataset to be processed}
 
 \item{outcome}{indicates the type of data to be processed, e.g. response time or accuracy rates}
 
-\item{score}{indicates how the outcome score is calculated, e.g. most commonly the difference score between two trial types}
+\item{score}{indicates how the outcome score is calculated, e.g. most commonly the difference score between two trial types. Can be "average", "difference", "difference_of_difference", and "DPrime"}
 
 \item{conditionlist}{sets conditions/blocks to be processed}
 
@@ -25,6 +38,8 @@ splithalf(data, outcome = "RT", score = "difference",
 \item{permutations}{specifies the number of random splits to run - 5000 is good}
 
 \item{var.RT}{specifies the RT variable name in data}
+
+\item{var.ACC}{specifiec the accuracy variable name in data}
 
 \item{var.condition}{specifies the condition variable name in data - if not specified then splithalf will treat all trials as one condition}
 
@@ -39,6 +54,10 @@ splithalf(data, outcome = "RT", score = "difference",
 \item{compare2}{specifies the first trial type to be compared (e.g. incongruent trials)}
 
 \item{average}{use mean or median to calculate average scores?}
+
+\item{plot}{gives the option to visualise the estimates in a raincloud plot. defaults to FALSE}
+
+\item{round.to}{sets the number of decimals to round the estimates to defaults to 2}
 }
 \value{
 Returns a data frame containing permutation based split-half reliability estimates
