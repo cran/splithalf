@@ -1,22 +1,25 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+    #> Warning: package 'ggplot2' was built under R version 4.1.2
+
 <img src="inst/hexlogo/splithalf_logo.png" height="300"/>
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.03041/status.svg)](https://doi.org/10.21105/joss.03041)
 [![CRAN
 Version](http://www.r-pkg.org/badges/version/splithalf)](https://cran.r-project.org/package=splithalf)
 [![Downloads](https://cranlogs.r-pkg.org/badges/splithalf)](https://cran.r-project.org/package=splithalf)
 
 # splithalf: robust estimates of split half reliability
 
-The `R` package *splithalf* provides tools to estimate the internal
+The `R` package **splithalf** provides tools to estimate the internal
 consistency reliability of cognitive measures. In particular, the tools
 were developed for application to tasks that use difference scores as
 the main outcome measure, for instance the Stroop score or dot-probe
 attention bias index (average RT in incongruent trials minus average RT
 in congruent trials).
 
-The methods in *splithalf* are built around split half reliability
+The methods in **splithalf** are built around split half reliability
 estimation. To increase the robustness of these estimates, the package
 implements a permutation approach that takes a large number of random
 (without replacement) split halves of the data. For each permutation the
@@ -27,39 +30,43 @@ statistics (e.g. average and 95% HDI).
 
 ### Why should I estimate the reliabilty of my task measurement?
 
-while many cognitive tasks yield robust effects (e.g. everybody shows a
+While many cognitive tasks yield robust effects (e.g. everybody shows a
 Stroop effect) they may not yield reliable individual differences
 (Hedge, Powell, and Sumner 2018). As these measures are used in
 questions of individual differences researchers need to have some
 psychometric information for the outcome measures. Recently, it was
 proposed that psychological science should set a standard expectation
 for the reporting of reliability information for cognitive and
-behavioural measures (2019). *splithalf* was developed to support this
-proposition by providing a tool to easily extract internal consistency
-reliability estimates from behavioural measures. \#\# Installation
+behavioural measures (Parsons, Kruijt, and Fox 2019). **splithalf** was
+developed to support this proposition by providing a tool to easily
+extract internal consistency reliability estimates from behavioural
+measures.
 
-The latest release version (`0.7.1` unofficial version name: Kitten
+## Installation
+
+The latest release version (`0.7.2` unofficial version name: Kitten
 Mittens) can be installed from CRAN:
 
 ``` r
 install.packages("splithalf")
 ```
 
-The current developmental version can be installed from Github with:
+The current developmental version (`0.8.1` unofficial version name: Rum
+Ham) can be installed from Github with:
 
 ``` r
 devtools::install_github("sdparsons/splithalf")
 ```
 
-*splithalf* requires the *tidyr* (Wickham and Henry 2019) and *dplyr*
-(Wickham et al. 2018) packages for data handling within the functions.
-The *robustbase* package is used to extract median scores when
-applicable. The computationally heavy tasks (extracting many random half
-samples of the data) are written in `c++` via the `R` package *Rcpp*
-(Eddelbuettel et al. 2018). Figures use the *ggplot* package (Wickham
-2016), raincloud plots use code adapted from Allen et al. (Allen et al.
-2019), and the *patchwork* package (Pedersen 2019) is used for plotting
-the multiverse analyses.
+**splithalf** requires the **tidyr** (Wickham and Henry 2019) and
+**dplyr** (Wickham et al. 2018) packages for data handling within the
+functions. The **robustbase** package is used to extract median scores
+when applicable. The computationally heavy tasks (extracting many random
+half samples of the data) are written in `c++` via the `R` package
+**Rcpp** (Eddelbuettel et al. 2018). Figures use the **ggplot** package
+(Wickham 2016), raincloud plots use code adapted from Allen et al.
+(Allen et al. 2019), and the **patchwork** package (Pedersen 2019) is
+used for plotting the multiverse analyses.
 
 ### Citing the package
 
@@ -69,9 +76,9 @@ the package is used so that I can solicit feedback and improve the
 package more generally. This would also help me track the uptake of
 reporting measurement reliability over time.
 
-Please use the following reference for the code: Parsons, Sam (2020):
-splithalf: robust estimates of split half reliability. figshare.
-Software. <https://doi.org/10.6084/m9.figshare.11956746.v4>
+Please use the following reference for the code: Parsons, S., (2021).
+splithalf: robust estimates of split half reliability. *Journal of Open
+Source Software, 6*(60), 3041, <https://doi.org/10.21105/joss.03041>
 
 ### User feedback
 
@@ -86,11 +93,15 @@ quickly as possible. These kind of help requests are super welcome. In
 fact, the package has seen several increases in performance and
 usability due to people asking for help.
 
-## Latest update:
+## Latest updates:
+
+**Version 0.8.1 now out! \[unofficial version name: “Rum Ham”\]** Lots
+of fixed issues in the multiverse functions, and lots more
+documentation/examples!
 
 **Now on github and submitted to CRAN: VERSION 0.7.2 \[unofficial
 version name: “Kitten Mittens”\]** Featuring reliability multiverse
-analyses\!\!\!
+analyses!!!
 
 This update includes the addition of reliability multiverse functions. A
 *splithalf* object can be inputted into *splithalf.multiverse* to
@@ -98,7 +109,7 @@ estimate reliability across a user-defined list of data-processing
 specifications (e.g. min/max RTs). Then, because sometimes science is
 more art than science, the multiverse output can be plotted with
 *multiverse.plot*. A brief tutorial can be found below, and a more
-comprehensive one can be found in a recent preprint (Parsons 2020b).
+comprehensive one can be found in a recent preprint (Parsons 2020).
 
 Additionally, the output of splithalf has been reworked. Now a list is
 returned including the specific function calls, the processed data.
@@ -114,17 +125,17 @@ It is important that we have a similar understanding of the terminology
 I use in the package and documentation. Each is also discussed in
 reference to the functions later in the documentation.
 
-  - Trial – whatever happens in this task, e.g. a stimuli is presented.
+-   Trial – whatever happens in this task, e.g. a stimuli is presented.
     Importantly, participants give one response per trial
-  - Trial type – often trials can be split into different trial types
+-   Trial type – often trials can be split into different trial types
     (e.g. to compare congruent and incongruent trials)
-  - Condition - this might be different blocks of trials, or something
+-   Condition - this might be different blocks of trials, or something
     to be assessed separately within the functions. e.g. a task might
     have a block of ‘positive’ trials and a block of ‘negative’ trials.
-  - Datatype - I use this to refer to the outcome of interest.
+-   Datatype - I use this to refer to the outcome of interest.
     specifically whether one is interested in average response times or
     accuracy rates
-  - Score - I use score to indicate how the final outcome is measured;
+-   Score - I use score to indicate how the final outcome is measured;
     e.g. the average RT, or the difference between two average RTs, or
     even the difference between two differences between two RTs (yes,
     the final one is confusing)
@@ -143,15 +154,15 @@ data-processing steps. I also highly recommend the Software Carpentry
 course “R for Reproducible Scientific Analysis”
 (<https://swcarpentry.github.io/r-novice-gapminder/>).
 
-Note == indicates ‘is equal to’, :: indicates that the function uses the
+Note == indicates ‘is equal to,’ :: indicates that the function uses the
 package indicated, in the first case the **dplyr** package (Wickham et
 al. 2018).
 
 ``` r
 dataset %>%    
-filter(accuracy == 1) %>%       ## keeps only trials in which participants made an accurate response
-filter(RT >= 100, RT <= 2000)  %>%   ## removes RTs less than 100ms and greater than 2000ms
-filter(participant != c(“p23”, “p45”)    ## removes participants “p23” and “p45”
+  dplyr::filter(accuracy == 1) %>%       ## keeps only trials in which participants made an accurate response
+  dplyr::filter(RT >= 100, RT <= 2000)  %>%   ## removes RTs less than 100ms and greater than 2000ms
+  dplyr::filter(participant != c(“p23”, “p45”)    ## removes participants “p23” and “p45”
 ```
 
 If following rt trims you also trimmed by SD, use the following as well.
@@ -195,16 +206,16 @@ need, and are aimed to make the *splithalf* function easy to use.
 
 Are you interested in response times, or accuracy rates?
 
-Knowing this, you can set *outcome* = “RT”, or *outcome* = “accuracy”
+Knowing this, you can set `outcome = "RT"`, or `outcome = "accuracy"`
 
 2.  **How is your outcome score calculated?**
 
 Say that your response time based task has two trial types;
-“incongruent” and “congruent”. When you analyse your data will you
-use the average RT in each trial type, or will you create a difference
-score (or bias) by e.g. subtracting the average RT in congruent trials
-from the average RT in incongruent trials. The first I call “average”
-and the second I call “difference”.
+“incongruent” and “congruent.” When you analyse your data will you use
+the average RT in each trial type, or will you create a difference score
+(or bias) by e.g. subtracting the average RT in congruent trials from
+the average RT in incongruent trials. The first can be called with
+`score = "average"` and the second with `score = "difference"`.
 
 3.  **Which method would you like to use to estimate (split-half)
     reliability?**
@@ -252,24 +263,24 @@ library("dplyr")
 library("tidyr")
 
 sim_data %>%
-  group_by(participant_number, block_name, trial_type) %>%
-  summarise(average = mean(RT)) %>%
-  spread(trial_type, average) %>%
-  mutate(bias = congruent - incongruent)
+  dplyr::group_by(participant_number, block_name, trial_type) %>%
+  dplyr::summarise(average = mean(RT)) %>%
+  tidyr::spread(trial_type, average) %>%
+  dplyr::mutate(bias = congruent - incongruent)
 # A tibble: 120 x 5
 # Groups:   participant_number, block_name [120]
    participant_number block_name congruent incongruent   bias
-                <int> <fct>          <dbl>       <dbl>  <dbl>
- 1                  1 A               502.        506.  -4.61
- 2                  1 B               561.        504.  56.7 
- 3                  2 A               521.        479.  42.0 
- 4                  2 B               515.        517.  -1.93
- 5                  3 A               471.        484. -12.9 
- 6                  3 B               522.        517.   4.74
- 7                  4 A               487.        480.   7.19
- 8                  4 B               505.        474.  30.4 
- 9                  5 A               475.        406.  69.7 
-10                  5 B               541.        511.  29.7 
+                <int> <chr>          <dbl>       <dbl>  <dbl>
+ 1                  1 A               550.        430. 120.  
+ 2                  1 B               512.        433.  78.9 
+ 3                  2 A               525.        496.  28.6 
+ 4                  2 B               488.        523. -35.2 
+ 5                  3 A               457.        500. -43.6 
+ 6                  3 B               478.        518. -39.3 
+ 7                  4 A               492.        479.  13.1 
+ 8                  4 B               593.        458. 135.  
+ 9                  5 A               568.        565.   2.72
+10                  5 B               485.        555. -70.3 
 # ... with 110 more rows
 ```
 
@@ -294,11 +305,9 @@ difference <- splithalf(data = sim_data,
                         plot = TRUE)
 ```
 
-``` 
-  condition  n splithalf 95_low 95_high spearmanbrown SB_low SB_high
-1         A 60      0.01  -0.16    0.19          0.01  -0.28    0.32
-2         B 60     -0.07  -0.25    0.12         -0.13  -0.40    0.21
-```
+      condition  n splithalf 95_low 95_high spearmanbrown SB_low SB_high
+    1         A 60     -0.06  -0.23    0.13         -0.10  -0.37    0.23
+    2         B 60     -0.13  -0.30    0.06         -0.22  -0.46    0.10
 
 Specifying `plot = TRUE` will also allow you to plot the distributions
 of reliability estimates. you can extract the plot from a saved object
@@ -334,10 +343,10 @@ Negative reliabilities are near uninterpretable and the spearman-brown
 formula is not useful in this case.
 
 > We estimated the internal consitency of bias A and B using a
-> permutation-based splithalf approach (Parsons 2020a) with 5000 random
+> permutation-based splithalf approach (Parsons 2019) with 5000 random
 > splits. The (Spearman-Brown corrected) splithalf internal consistency
-> of bias A was were *r*<sub>SB</sub> = 0.01, 95%CI \[-0.28,0.32\].
-> 
+> of bias A was were *r*<sub>SB</sub> = -0.1, 95%CI \[-0.37,0.23\].
+>
 > — Parsons, 2020
 
 ### Average scores
@@ -346,7 +355,7 @@ For some tasks the outcome measure may simply be the average RT. In this
 case, we will ignore the trial type option. We will extract separate
 outcome scores for each block of trials, but this time it is simply the
 average RT in each block. Note that the main difference in this code is
-that we have omitted the inputs about what trial types to ‘compare’, as
+that we have omitted the inputs about what trial types to ‘compare,’ as
 this is irrelevant for the current task.
 
 ``` r
@@ -360,15 +369,11 @@ average <- splithalf(data = sim_data,
                      var.condition = "block_name",
                      var.participant = "participant_number",
                      average = "mean")
-Warning in splithalf(data = sim_data, outcome = "RT", score = "average", :
-var.trialnum will soon be depreciated
 ```
 
-``` 
-  condition  n splithalf 95_low 95_high spearmanbrown SB_low SB_high
-1         A 60      0.07  -0.11    0.26          0.12  -0.19    0.41
-2         B 60      0.09  -0.08    0.27          0.15  -0.16    0.43
-```
+      condition  n splithalf 95_low 95_high spearmanbrown SB_low SB_high
+    1         A 60      0.16  -0.02    0.34          0.26  -0.03    0.51
+    2         B 60      0.05  -0.13    0.24          0.09  -0.23    0.39
 
 ### Difference-of-difference scores
 
@@ -376,7 +381,7 @@ The difference of differences score is a bit more complex, and perhaps
 also less common. I programmed this aspect of the package initially
 because I had seen a few papers that used a change in bias score in
 their analysis, and I wondered “I wonder how reliable that is as an
-individual difference measure”. Be warned, difference scores are nearly
+individual difference measure.” Be warned, difference scores are nearly
 always less reliable than raw averages, and differences-of-differences
 will be less reliable again.
 
@@ -392,13 +397,12 @@ Outcome = BiasB - BiasA
 
 In our function, we specify this very similarly as in the difference
 score example. The only change will be changing the score to
-“difference\_of\_difference”. Note that we will keep the condition
-list consisting of A and B. But, specifying that we are interested in
-the difference of differences will lead the function to calculate the
+“difference\_of\_difference.” Note that we will keep the condition list
+consisting of A and B. But, specifying that we are interested in the
+difference of differences will lead the function to calculate the
 outcome scores apropriately.
 
 ``` r
-
 diff_of_diff <- splithalf(data = sim_data,
                         outcome = "RT",
                         score = "difference_of_difference",
@@ -412,18 +416,16 @@ diff_of_diff <- splithalf(data = sim_data,
                         compare1 = "congruent",
                         compare2 = "incongruent",
                         average = "mean")
-Warning in splithalf(data = sim_data, outcome = "RT", score =
-"difference_of_difference", : var.trialnum will soon be depreciated
 ```
 
-``` 
-     condition  n splithalf 95_low 95_high spearmanbrown SB_low SB_high
-1 change score 60     -0.18  -0.34       0          -0.3  -0.51       0
-```
+                           condition  n splithalf 95_low 95_high spearmanbrown
+    1 difference_of_difference score 60     -0.12  -0.29    0.07         -0.21
+      SB_low SB_high
+    1  -0.45    0.13
 
 ## Multiverse analysis extension
 
-This example is simplified from Parsons (2020b). The process takes four
+This example is simplified from Parsons (2020). The process takes four
 steps. First, specify a list of data processing decisions. Here, we’ll
 specify only removing trials greater or lower than a specified amount.
 More options are available, such as total accuracy cutoff thresholds for
@@ -435,7 +437,10 @@ specifications <- list(RT_min = c(0, 100, 200),
                        averaging_method = c("mean", "median"))
 ```
 
-Second, perform `splithalf(...)`. The key difference here is …
+Second, perform `splithalf(...)`. The key difference here, compared to
+the earlier examples is that we are no longer assuming that all data
+processing has already occurred. Instead, the data processing will be
+performed as part of `splithalf.multiverse`, next.
 
 ``` r
 difference <- splithalf(data = sim_data,
@@ -452,8 +457,6 @@ difference <- splithalf(data = sim_data,
                         compare1 = "congruent",
                         compare2 = "incongruent",
                         average = "mean")
-Warning in splithalf(data = sim_data, outcome = "RT", score = "difference", :
-var.trialnum will soon be depreciated
 ```
 
 Third, perform `splithalf.multiverse` with the specification list and
@@ -497,40 +500,41 @@ The speed of *splithalf* rests entirely on the number of conditions,
 participants, and permutations. The biggest factor will be your machine
 speed. For relative times, I ran a simulation with a range of sample
 sizes, numbers of conditions, numbers of trials, and permutations. The
-data is contained within the package as `data/speedtest.csv`
+data is contained within the package as `data/speedtest.rda`
 
 ![](man/figures/README-speedtest-1.png)<!-- -->
 
 ## Future development
 
-The *splithalf* package is still under development. If you have
+The **splithalf** package is still under development. If you have
 suggestions for improvements to the package, or bugs to report, please
 raise an issue on github (<https://github.com/sdparsons/splithalf>).
 Currently, I have the following on my immediate to do list:
 
-  - error tracking
-      - I plan to develop a function that catches potential issues that
+-   error tracking
+    -   I plan to develop a function that catches potential issues that
         could arise with the functions.
-      - I also plan to document common R warnings and errors that arise
+    -   I also plan to document common R warnings and errors that arise
         and why (as sometimes without knowing exactly how the functions
         work these issues can be harder to trace back).
-  - include other scoring methods:
-      - signal detection, e.g. d prime
-      - potentially customisable methods, e.g. where the outcome is
+-   include other scoring methods:
+    -   signal detection, e.g. d prime
+    -   potentially customisable methods, e.g. where the outcome is
         scored in formats similar to A - B / A + B
 
 ## Comparison to other software
 
-*splithalf* is the only package to implement all of these tools, in
+**splithalf** is the only package to implement all of these tools, in
 particular reliability multiverse analyses. Some other `R` packages
-offer a bootstrapped approach to split-half reliability *multicon*
-(Sherman 2015), *psych* (Revelle 2019), and *splithalfr* (Pronk 2020)
+offer a bootstrapped approach to split-half reliability **multicon**
+(Sherman 2015), **psych** (Revelle 2019), and **splithalfr** (Pronk
+2020)
 
 ## References
 
-<div id="refs" class="references">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-allen_raincloud_2019">
+<div id="ref-allen_raincloud_2019" class="csl-entry">
 
 Allen, Micah, Davide Poggiali, Kirstie Whitaker, Tom Rhys Marshall, and
 Rogier A. Kievit. 2019. “Raincloud Plots: A Multi-Platform Tool for
@@ -539,15 +543,15 @@ Robust Data Visualization.” *Wellcome Open Research* 4 (April): 63.
 
 </div>
 
-<div id="ref-R-Rcpp">
+<div id="ref-R-Rcpp" class="csl-entry">
 
 Eddelbuettel, Dirk, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou,
 Nathan Russell, Douglas Bates, and John Chambers. 2018. *Rcpp: Seamless
-R and C++ Integration*. <https://CRAN.R-project.org/package=Rcpp>.
+r and c++ Integration*. <https://CRAN.R-project.org/package=Rcpp>.
 
 </div>
 
-<div id="ref-hedge_reliability_2018">
+<div id="ref-hedge_reliability_2018" class="csl-entry">
 
 Hedge, Craig, Georgina Powell, and Petroc Sumner. 2018. “The Reliability
 Paradox: Why Robust Cognitive Tasks Do Not Produce Reliable Individual
@@ -556,46 +560,45 @@ Differences.” *Behavior Research Methods* 50 (3): 1166–86.
 
 </div>
 
-<div id="ref-R-splithalf">
+<div id="ref-R-splithalf" class="csl-entry">
 
-Parsons, Sam. 2020a. *Splithalf: Robust Estimates of Split Half
-Reliability.* <https://doi.org/10.6084/m9.figshare.11956746.v4>.
+Parsons, Sam. 2019. “Splithalf; Robust Estimates of Split Half
+Reliability.” <https://doi.org/10.6084/m9.figshare.5559175.v5>.
 
 </div>
 
-<div id="ref-parsons_exploring_2020">
+<div id="ref-parsons_exploring_2020" class="csl-entry">
 
-———. 2020b. “Exploring Reliability Heterogeneity with Multiverse
+———. 2020. “Exploring Reliability Heterogeneity with Multiverse
 Analyses: Data Processing Decisions Unpredictably Influence Measurement
 Reliability.” Preprint, June. <https://doi.org/10.31234/osf.io/y6tcz>.
 
 </div>
 
-<div id="ref-parsons_kruijt_fox_2019">
+<div id="ref-parsons_kruijt_fox_2019" class="csl-entry">
 
 Parsons, Sam, Anne-Wil Kruijt, and Elaine Fox. 2019. “Psychological
 Science Needs a Standard Practice of Reporting the Reliability of
 Cognitive Behavioural Measurements.” Advances in Methods; Practices in
-Psychological Science.
-<https://doi.org/https://doi.org/10.1177/2515245919879695>.
+Psychological Science. https://doi.org/10.1177/2515245919879695.
 
 </div>
 
-<div id="ref-R-patchwork">
+<div id="ref-R-patchwork" class="csl-entry">
 
 Pedersen, Thomas Lin. 2019. *Patchwork: The Composer of Plots*.
 <https://CRAN.R-project.org/package=patchwork>.
 
 </div>
 
-<div id="ref-R-splithalfr">
+<div id="ref-R-splithalfr" class="csl-entry">
 
 Pronk, Thomas. 2020. *Splithalfr: Extensible Bootstrapped Split-Half
 Reliabilities*. <https://CRAN.R-project.org/package=splithalfr>.
 
 </div>
 
-<div id="ref-R-psych">
+<div id="ref-R-psych" class="csl-entry">
 
 Revelle, William. 2019. *Psych: Procedures for Psychological,
 Psychometric, and Personality Research*. Evanston, Illinois:
@@ -603,29 +606,29 @@ Northwestern University. <https://CRAN.R-project.org/package=psych>.
 
 </div>
 
-<div id="ref-R-multicon">
+<div id="ref-R-multicon" class="csl-entry">
 
 Sherman, Ryne A. 2015. *Multicon: Multivariate Constructs*.
 <https://CRAN.R-project.org/package=multicon>.
 
 </div>
 
-<div id="ref-spearman_proof_1904">
+<div id="ref-spearman_proof_1904" class="csl-entry">
 
 Spearman, C. 1904. “The Proof and Measurement of Association Between Two
 Things.” *The American Journal of Psychology* 15 (1): 72.
-<https://doi.org/10.2307/1412159>.
+https://doi.org/10.2307/1412159.
 
 </div>
 
-<div id="ref-R-ggplot2">
+<div id="ref-R-ggplot2" class="csl-entry">
 
 Wickham, Hadley. 2016. *Ggplot2: Elegant Graphics for Data Analysis*.
 Springer-Verlag New York. <https://ggplot2.tidyverse.org>.
 
 </div>
 
-<div id="ref-R-dplyr">
+<div id="ref-R-dplyr" class="csl-entry">
 
 Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2018.
 *Dplyr: A Grammar of Data Manipulation*.
@@ -633,7 +636,7 @@ Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2018.
 
 </div>
 
-<div id="ref-R-tidyr">
+<div id="ref-R-tidyr" class="csl-entry">
 
 Wickham, Hadley, and Lionel Henry. 2019. *Tidyr: Tidy Messy Data*.
 <https://CRAN.R-project.org/package=tidyr>.

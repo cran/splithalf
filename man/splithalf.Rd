@@ -15,19 +15,19 @@ splithalf(
   var.ACC = "accuracy",
   var.condition = FALSE,
   var.participant = "subject",
-  var.trialnum = "trialnum",
   var.compare = "congruency",
   compare1 = "Congruent",
   compare2 = "Incongruent",
   average = "mean",
   plot = FALSE,
-  round.to = 2
+  round.to = 2,
+  check = TRUE
 )
 }
 \arguments{
 \item{data}{specifies the raw dataset to be processed}
 
-\item{outcome}{indicates the type of data to be processed, e.g. response time or accuracy rates}
+\item{outcome}{indicates the type of data to be processed, e.g. "RT" or "accuracy"}
 
 \item{score}{indicates how the outcome score is calculated, e.g. most commonly the difference score between two trial types. Can be "average", "difference", "difference_of_difference", and "DPrime"}
 
@@ -39,25 +39,25 @@ splithalf(
 
 \item{var.RT}{specifies the RT variable name in data}
 
-\item{var.ACC}{specifiec the accuracy variable name in data}
+\item{var.ACC}{specific the accuracy variable name in data}
 
 \item{var.condition}{specifies the condition variable name in data - if not specified then splithalf will treat all trials as one condition}
 
 \item{var.participant}{specifies the subject variable name in data}
 
-\item{var.trialnum}{specifies the trial number variable}
-
-\item{var.compare}{specified the variable that is used to calculate difference scores (e.g. including congruent and incongruent trials)}
+\item{var.compare}{specifies the variable that is used to calculate difference scores (e.g. including congruent and incongruent trials)}
 
 \item{compare1}{specifies the first trial type to be compared (e.g. congruent trials)}
 
-\item{compare2}{specifies the first trial type to be compared (e.g. incongruent trials)}
+\item{compare2}{specifies the second trial type to be compared (e.g. incongruent trials)}
 
-\item{average}{use mean or median to calculate average scores?}
+\item{average}{use "mean" or "median" to calculate average scores?}
 
-\item{plot}{gives the option to visualise the estimates in a raincloud plot. defaults to FALSE}
+\item{plot}{logical value giving the option to visualise the estimates in a raincloud plot. defaults to FALSE}
 
 \item{round.to}{sets the number of decimals to round the estimates to defaults to 2}
+
+\item{check}{runs several checks of the data to detect participants/conditions/trialtypes with too few trials to run splithalf}
 }
 \value{
 Returns a data frame containing permutation based split-half reliability estimates
@@ -69,9 +69,73 @@ spearmanbrown is the spearman-brown corrected estimate of the bias index
 Warning: If there are missing data (e.g one condition data missing for one participant) output will include details of the missing data and return a dataframe containing the NA data. Warnings will be displayed in the console.
 }
 \description{
-This function calculates split half reliability estimates via a permutation approach for a wide range of tasks
+This function calculates split half reliability estimates via a permutation approach for a wide range of tasks. Most of the user inputs relate to the variables in the dataset splithalf needs to read in order to estimate reliability. Currently supports response time and accuracy outcomes, for several scoring methods: average, difference, difference of difference scores, and a DPrime development.
 The (unofficial) version name is "This function gives me the power to fight like a crow"
 }
 \examples{
-## see online documentation for examples
+\dontrun{
+## see online documentation for full examples
+https://github.com/sdparsons/splithalf
+## example simulated data
+n_participants = 60 ## sample size
+n_trials = 80
+n_blocks = 2
+sim_data <- data.frame(participant_number = rep(1:n_participants,
+                       each = n_blocks * n_trials),
+                       trial_number = rep(1:n_trials,
+                       times = n_blocks * n_participants),
+                       block_name = rep(c("A","B"),
+                       each = n_trials,
+                       length.out = n_participants * n_trials * n_blocks),
+                       trial_type = rep(c("congruent","incongruent"),
+                       length.out = n_participants * n_trials * n_blocks),
+                       RT = rnorm(n_participants * n_trials * n_blocks,
+                       500,
+                       200),
+                       ACC = 1)
+
+## example run of splithalf on a difference score
+splithalf(data = sim_data,
+          outcome = "RT",
+          score = "difference",
+          conditionlist = c("A", "B"),
+          halftype = "random",
+          permutations = 5000,
+          var.RT = "RT",
+          var.condition = "block_name",
+          var.participant = "participant_number",
+          var.compare = "trial_type",
+          compare1 = "congruent",
+          compare2 = "incongruent",
+          average = "mean",
+          plot = TRUE)
+
+## example run of splithalf on an average score
+splithalf(data = sim_data,
+          outcome = "RT",
+          score = "average",
+          conditionlist = c("A", "B"),
+          halftype = "random",
+          permutations = 5000,
+          var.RT = "RT",
+          var.condition = "block_name",
+          var.participant = "participant_number",
+          average = "mean")
+
+## example run of splithalf on a difference of differences score
+splithalf(data = sim_data,
+          outcome = "RT",
+          score = "difference_of_difference",
+          conditionlist = c("A", "B"),
+          halftype = "random",
+          permutations = 5000,
+          var.RT = "RT",
+          var.condition = "block_name",
+          var.participant = "participant_number",
+          var.compare = "trial_type",
+          compare1 = "congruent",
+          compare2 = "incongruent",
+          average = "mean")
+
+}
 }

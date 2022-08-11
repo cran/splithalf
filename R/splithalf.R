@@ -1,37 +1,102 @@
 #' Internal consistency of task measures via a permutation split-half reliability approach
 #'
-#' This function calculates split half reliability estimates via a permutation approach for a wide range of tasks
+#' This function calculates split half reliability estimates via a permutation approach for a wide range of tasks. Most of the user inputs relate to the variables in the dataset splithalf needs to read in order to estimate reliability. Currently supports response time and accuracy outcomes, for several scoring methods: average, difference, difference of difference scores, and a DPrime development.
 #' The (unofficial) version name is "This function gives me the power to fight like a crow"
 #' @param data specifies the raw dataset to be processed
-#' @param outcome indicates the type of data to be processed, e.g. response time or accuracy rates
+#' @param outcome indicates the type of data to be processed, e.g. "RT" or "accuracy"
 #' @param score indicates how the outcome score is calculated, e.g. most commonly the difference score between two trial types. Can be "average", "difference", "difference_of_difference", and "DPrime"
 #' @param conditionlist sets conditions/blocks to be processed
 #' @param halftype specifies the split method; "oddeven", "halfs", or "random"
 #' @param permutations specifies the number of random splits to run - 5000 is good
 #' @param var.RT specifies the RT variable name in data
-#' @param var.ACC specifiec the accuracy variable name in data
+#' @param var.ACC specific the accuracy variable name in data
 #' @param var.condition specifies the condition variable name in data - if not specified then splithalf will treat all trials as one condition
 #' @param var.participant specifies the subject variable name in data
-#' @param var.trialnum specifies the trial number variable
-#' @param var.compare specified the variable that is used to calculate difference scores (e.g. including congruent and incongruent trials)
+#' @param var.compare specifies the variable that is used to calculate difference scores (e.g. including congruent and incongruent trials)
 #' @param compare1 specifies the first trial type to be compared (e.g. congruent trials)
-#' @param compare2 specifies the first trial type to be compared (e.g. incongruent trials)
-#' @param average use mean or median to calculate average scores?
-#' @param plot gives the option to visualise the estimates in a raincloud plot. defaults to FALSE
+#' @param compare2 specifies the second trial type to be compared (e.g. incongruent trials)
+#' @param average use "mean" or "median" to calculate average scores?
+#' @param plot logical value giving the option to visualise the estimates in a raincloud plot. defaults to FALSE
 #' @param round.to sets the number of decimals to round the estimates to defaults to 2
+#' @param check runs several checks of the data to detect participants/conditions/trialtypes with too few trials to run splithalf
 #' @return Returns a data frame containing permutation based split-half reliability estimates
 #' @return splithalf is the raw estimate of the bias index
 #' @return spearmanbrown is the spearman-brown corrected estimate of the bias index
 #' @return Warning: If there are missing data (e.g one condition data missing for one participant) output will include details of the missing data and return a dataframe containing the NA data. Warnings will be displayed in the console.
 #' @examples
-#' ## see online documentation for examples
+#' \dontrun{
+#' ## see online documentation for full examples
+#' https://github.com/sdparsons/splithalf
+#' ## example simulated data
+#' n_participants = 60 ## sample size
+#' n_trials = 80
+#' n_blocks = 2
+#' sim_data <- data.frame(participant_number = rep(1:n_participants,
+#'                        each = n_blocks * n_trials),
+#'                        trial_number = rep(1:n_trials,
+#'                        times = n_blocks * n_participants),
+#'                        block_name = rep(c("A","B"),
+#'                        each = n_trials,
+#'                        length.out = n_participants * n_trials * n_blocks),
+#'                        trial_type = rep(c("congruent","incongruent"),
+#'                        length.out = n_participants * n_trials * n_blocks),
+#'                        RT = rnorm(n_participants * n_trials * n_blocks,
+#'                        500,
+#'                        200),
+#'                        ACC = 1)
+#'
+#' ## example run of splithalf on a difference score
+#' splithalf(data = sim_data,
+#'           outcome = "RT",
+#'           score = "difference",
+#'           conditionlist = c("A", "B"),
+#'           halftype = "random",
+#'           permutations = 5000,
+#'           var.RT = "RT",
+#'           var.condition = "block_name",
+#'           var.participant = "participant_number",
+#'           var.compare = "trial_type",
+#'           compare1 = "congruent",
+#'           compare2 = "incongruent",
+#'           average = "mean",
+#'           plot = TRUE)
+#'
+#' ## example run of splithalf on an average score
+#' splithalf(data = sim_data,
+#'           outcome = "RT",
+#'           score = "average",
+#'           conditionlist = c("A", "B"),
+#'           halftype = "random",
+#'           permutations = 5000,
+#'           var.RT = "RT",
+#'           var.condition = "block_name",
+#'           var.participant = "participant_number",
+#'           average = "mean")
+#'
+#' ## example run of splithalf on a difference of differences score
+#' splithalf(data = sim_data,
+#'           outcome = "RT",
+#'           score = "difference_of_difference",
+#'           conditionlist = c("A", "B"),
+#'           halftype = "random",
+#'           permutations = 5000,
+#'           var.RT = "RT",
+#'           var.condition = "block_name",
+#'           var.participant = "participant_number",
+#'           var.compare = "trial_type",
+#'           compare1 = "congruent",
+#'           compare2 = "incongruent",
+#'           average = "mean")
+#'
+#' }
 #' @import tidyr
 #' @import Rcpp
 #' @import ggplot2
 #' @import grid
 #' @importFrom stats complete.cases cor median na.omit quantile sd
 #' @importFrom robustbase colMedians
-#' @importFrom dplyr select summarise group_by mutate n_distinct
+#' @importFrom dplyr select summarise group_by mutate n_distinct count
+#' @importFrom tidyr complete
 #' @importFrom plyr arrange
 #' @useDynLib splithalf, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
@@ -39,22 +104,22 @@
 #' @export
 
 splithalf <- function(data,
-                             outcome = "RT",
-                             score = "difference",
-                             conditionlist = FALSE,
-                             halftype = "random",
-                             permutations = 5000,
-                             var.RT = "latency",
-                             var.ACC = "accuracy",
-                             var.condition = FALSE,
-                             var.participant = "subject",
-                             var.trialnum = "trialnum",
-                             var.compare = "congruency",
-                             compare1 = "Congruent",
-                             compare2 = "Incongruent",
-                             average = "mean",
-                             plot = FALSE,
-                             round.to = 2)
+                      outcome = "RT",
+                      score = "difference",
+                      conditionlist = FALSE,
+                      halftype = "random",
+                      permutations = 5000,
+                      var.RT = "latency",
+                      var.ACC = "accuracy",
+                      var.condition = FALSE,
+                      var.participant = "subject",
+                      var.compare = "congruency",
+                      compare1 = "Congruent",
+                      compare2 = "Incongruent",
+                      average = "mean",
+                      plot = FALSE,
+                      round.to = 2,
+                      check = TRUE)
 
 {
   # check that the dataframe is a data frame
@@ -93,9 +158,6 @@ splithalf <- function(data,
   }
   if (var.participant %in% colnames(data) == FALSE) {
     stop("the participant varible has not been specified")
-  }
-  if (var.trialnum %in% colnames(data) == FALSE) {
-    warning("var.trialnum will soon be depreciated")
   }
   if (score == "difference" | score == "difference_of_difference") {
     if (var.compare %in% colnames(data) == FALSE) {
@@ -142,7 +204,6 @@ splithalf <- function(data,
     var.ACC = var.ACC,
     var.condition = var.condition,
     var.participant = var.participant,
-    var.trialnum = var.trialnum,
     var.compare = var.compare,
     compare1 = compare1,
     compare2 = compare2,
@@ -209,6 +270,61 @@ splithalf <- function(data,
     data$accuracy <- data[, var.ACC]
   }
 
+
+  # check data for cases that will likely result in errors
+
+if(check == TRUE) {
+
+  if(score == "average") {
+    check1 <- data %>%
+      dplyr::group_by(participant, condition) %>%
+      dplyr::count() %>%
+      dplyr::ungroup() %>%
+      tidyr::complete(participant, condition)
+  }
+
+  if(score != "average") {
+    check1 <- data %>%
+      dplyr::group_by(participant, condition, compare) %>%
+      dplyr::count() %>%
+      dplyr::ungroup() %>%
+      tidyr::complete(participant, condition, compare)
+  }
+
+
+
+  # check for missing conditions and comparisons
+
+  check_missing <- check1 %>%
+    dplyr::filter(is.na(n))
+
+
+  # check for cases where there are not enough trials
+
+  check_lown <- check1 %>%
+    dplyr::filter(n < 4)
+
+  ## to be included: check for whether there is sufficient variance
+  # check_variance <- data %>%
+  #   dplyr::group_by(condition, compare) %>%
+  #   dplyr::summarise(var = var(RT))
+
+
+  if(nrow(check_missing) > 0) {
+    print(check_missing)
+    stop("splithalf unlikely to run: at least one participant is missing data from at least one condition or trial type - see above tibble for missing data")
+  }
+
+
+  if(nrow(check_lown) > 0) {
+    print(check_lown)
+    stop("splithalf unlikely to run: at least one participant has too few trials in at least one condition or trial type - see above tibble for participant in question")
+  }
+
+
+}
+
+
   # for randdom samples, the number of samples drawn
   iterations <- 1:permutations
 
@@ -216,7 +332,7 @@ splithalf <- function(data,
   dataset <- data
 
   # how many participants?
-  n_par <- n_distinct(dataset$participant)
+  n_par <- dplyr::n_distinct(dataset$participant)
 
   # creates a list of participants
   plist <- sort(unique(dataset$participant))
@@ -507,14 +623,14 @@ splithalf <- function(data,
         dplyr::group_by(condition) %>%
         dplyr::summarise(
           n = round(sum(!is.na(half1)), 0),
-          splithalf = cor(half1, half2,
-                          use = "pairwise.complete"),
-          spearmanbrown = (2 * cor(half1, half2,
+          splithalf = round(cor(half1, half2,
+                          use = "pairwise.complete"),round.to),
+          spearmanbrown = round((2 * cor(half1, half2,
                                    use = "pairwise.complete")) /
             (1 + (2 - 1) * abs(
               cor(half1, half2,
                   use = "pairwise.complete")
-            ))
+            )), round.to)
         ) %>%
         as.data.frame()
     }
@@ -535,8 +651,8 @@ splithalf <- function(data,
           cor2 = cor(difference2_1, difference2_2, use = "pairwise.complete"),
           n = dplyr::n()
         ) %>%
-        dplyr::mutate(splithalf = (cor1 + cor2) / 2) %>%
-        dplyr::mutate(spearmanbrown = (2 * splithalf) / ((1 + (2 - 1) * abs(splithalf)))) %>%
+        dplyr::mutate(splithalf = round((cor1 + cor2) / 2, round.to)) %>%
+        dplyr::mutate(spearmanbrown = round((2 * splithalf) / ((1 + (2 - 1) * abs(splithalf))), round.to)) %>%
         dplyr::select(-1, -2)
 
     }
@@ -966,7 +1082,8 @@ splithalf <- function(data,
           n = dplyr::n()
         ) %>%
         tidyr::gather("var", "splithalf", 2:3) %>%
-        dplyr::mutate(spearmanbrown = (2 * splithalf) / ((1 + (2 - 1) * abs(splithalf))))
+        dplyr::mutate(spearmanbrown = (2 * splithalf) / ((1 + (2 - 1) * abs(splithalf)))) %>%
+        dplyr::mutate(condition = "difference_of_difference score")
 
 
       # take the mean estimates per condition
@@ -983,7 +1100,7 @@ splithalf <- function(data,
         ) %>%
         as.data.frame()
 
-      out2 <- cbind(condition = "change score", out2)
+      out2 <- cbind(condition = "difference_of_difference score", out2)
 
     }
 

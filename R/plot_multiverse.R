@@ -1,14 +1,67 @@
 #' Visualising reliability multiverses
 #'
+#' This function allows the user to plot the output from splithalf_multiverse or testretest_multiverse. The plot includes an upper panel with all reliability estimates (and CIs) and a lower panel that indicates the data processing specifications corresponding to that reliability estimate.
 #' The (unofficial) function version name is "This function will make you a master in bird law"
-#' @param multiverse multiverse object or list of multiverse objects
-#' @param title add a title to the plot?
+#' @param multiverse multiverse object or list of multiverse objects from splithalf.multiverse()
+#' @param title string add a title to the plot? default is ""
 #' @param vline add a vertical line to the plot, e.g. use .5 for the median reliability estimate
-#' @param heights relative heights of plot panels, defaults to c(4,5)
-#' @param SE set to true to also plot the standard errors of the scores
-#' @return Returns a visualistation of a multiverse object
+#' @param heights must be a vector of length 2, relative heights of plot panels. Defaults to c(4,5)
+#' @param SE logical includes an additional panel to plot the standard errors of the scores. Note: the heights parameter must be a vector of length 3, e.g. c(2,2,3). Defaults to FALSE
+#' @return Returns a visualization of a multiverse object
 #' @examples
+#' \dontrun{
 #' ## see online documentation for examples
+#' https://github.com/sdparsons/splithalf
+#' ## also see https://psyarxiv.com/y6tcz
+#'
+#' ## example simulated data
+#' n_participants = 60 ## sample size
+#' n_trials = 80
+#' n_blocks = 2
+#' sim_data <- data.frame(participant_number = rep(1:n_participants,
+#'                        each = n_blocks * n_trials),
+#'                        trial_number = rep(1:n_trials,
+#'                        times = n_blocks * n_participants),
+#'                        block_name = rep(c("A","B"),
+#'                        each = n_trials,
+#'                        length.out = n_participants * n_trials * n_blocks),
+#'                        trial_type = rep(c("congruent","incongruent"),
+#'                        length.out = n_participants * n_trials * n_blocks),
+#'                        RT = rnorm(n_participants * n_trials * n_blocks,
+#'                        500,
+#'                        200),
+#'                        ACC = 1)
+#'
+#' ## specify several data processing decisions
+#' specifications <- list(RT_min = c(0, 100, 200),
+#'                        RT_max = c(1000, 2000),
+#'                        averaging_method = c("mean", "median"))
+#' ## run splithalf, and save the output
+#' difference <- splithalf(data = sim_data,
+#'                         outcome = "RT",
+#'                         score = "difference",
+#'                         conditionlist = c("A"),
+#'                         halftype = "random",
+#'                         permutations = 5000,
+#'                         var.RT = "RT",
+#'                         var.condition = "block_name",
+#'                         var.participant = "participant_number",
+#'                         var.compare = "trial_type",
+#'                         var.ACC = "ACC",
+#'                         compare1 = "congruent",
+#'                         compare2 = "incongruent",
+#'                         average = "mean")
+#'
+#' ## run splithalf.multiverse to perform the multiverse of data processing
+#' ## and reliability estimation
+#' multiverse <- splithalf.multiverse(input = difference,
+#'                                    specifications = specifications)
+#'
+#' ## can be plot with:
+#' multiverse.plot(multiverse = multiverse,
+#'                 title = "README multiverse")
+#'
+#' }
 #' @import tidyr
 #' @import Rcpp
 #' @import ggplot2
@@ -20,6 +73,7 @@
 #' @importFrom tidyr gather
 #' @importFrom plyr arrange
 #' @useDynLib splithalf, .registration = TRUE
+#' @importFrom methods is
 #' @importFrom Rcpp sourceCpp
 #' @importFrom utils setTxtProgressBar txtProgressBar capture.output
 #' @rdname multiverse.plot
@@ -36,11 +90,11 @@ multiverse.plot <- function(multiverse,
     stop("heights must be length 3 is SE = TRUE")
   }
 
-  if(class(multiverse) == "list") {
+  if(is(multiverse, "list")) {
     x <- length(multiverse)
 
     for(i in 1:x){
-      if(class(multiverse[[i]]) != "multiverse")
+      if(!is(multiverse[[i]], "multiverse"))
         stop("not all list objects are of class multiverse")
     }
 
@@ -81,7 +135,7 @@ multiverse.plot <- function(multiverse,
   }
 
 
-  if(class(multiverse) == "multiverse"){
+  if(is(multiverse, "multiverse")){
     final2 <- multiverse$estimates
     final2 <- final2[order(final2[,"estimate"]),]
     final2$SE <- multiverse$SE
@@ -89,7 +143,7 @@ multiverse.plot <- function(multiverse,
 
   suppressWarnings({
 
-    if(class(multiverse) == "multiverse"){
+    if(is(multiverse, "multiverse")){
       final2$ns <- 1:multiverse$nS
 
       reliability_plot <- ggplot(data = final2,
@@ -112,7 +166,7 @@ multiverse.plot <- function(multiverse,
         theme(plot.title = element_text(hjust = 0.5, face = "bold"))
     }
 
-    if(class(multiverse) == "list"){
+    if(is(multiverse, "list")){
       reliability_plot <- ggplot(data = final2,
                                  aes(x = ns, y = estimate, fill = time)) +
         geom_ribbon(aes(ymin = low, ymax = high, fill = time), alpha = .1)  +
@@ -136,7 +190,7 @@ multiverse.plot <- function(multiverse,
 
   suppressWarnings({
 
-    if(class(multiverse) == "multiverse"){
+    if(is(multiverse, "multiverse")){
 
       final2$ns <- 1:multiverse$nS
 
@@ -148,7 +202,7 @@ multiverse.plot <- function(multiverse,
 
     }
 
-    if(class(multiverse) == "list"){
+    if(is(multiverse, "list")){
       final3 <- final2 %>%
         dplyr::filter(time == 1) %>%
         tidyr::gather(key = "Bigdecision",
@@ -166,7 +220,7 @@ multiverse.plot <- function(multiverse,
                                                               "averaging_method"))
 
   suppressWarnings({
-    if(class(multiverse) == "multiverse"){
+    if(is(multiverse, "multiverse")){
       dashboard <- ggplot(data = subset(final3, Bigdecision %in% multiverse$cols),
                           aes(x = ns, y = Decision, colour = Bigdecision)) +
         facet_grid(Bigdecision ~ ., scales = "free", space = "free", drop = ) +
@@ -181,7 +235,7 @@ multiverse.plot <- function(multiverse,
               text = element_text(size=10))
     }
 
-    if(class(multiverse) == "list"){
+    if(is(multiverse, "list")){
       dashboard <- ggplot(data = subset(final3, Bigdecision %in% multiverse[[1]]$cols),
                           aes(x = ns, y = Decision, colour = Bigdecision)) +
         facet_grid(Bigdecision ~ ., scales = "free", space = "free", drop = ) +

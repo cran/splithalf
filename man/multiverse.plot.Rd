@@ -18,28 +18,139 @@ threshold(multiverse, threshold, use = "estimate", dir = "above")
 \arguments{
 \item{multiverse}{multiverse object}
 
-\item{title}{add a title to the plot?}
+\item{title}{string add a title to the plot? default is ""}
 
 \item{vline}{add a vertical line to the plot, e.g. use .5 for the median reliability estimate}
 
-\item{heights}{relative heights of plot panels, defaults to c(4,5)}
+\item{heights}{must be a vector of length 2, relative heights of plot panels. Defaults to c(4,5)}
 
-\item{SE}{set to true to also plot the standard errors of the scores}
+\item{SE}{logical includes an additional panel to plot the standard errors of the scores. Note: the heights parameter must be a vector of length 3, e.g. c(2,2,3). Defaults to FALSE}
 
-\item{threshold}{threshold to look for}
+\item{threshold}{threshold to look for, e.g. 0.7}
 
-\item{use}{set to check the reliability estimates, or the upper or lower CIs}
+\item{use}{set to check the reliability "estimates", or the "upper" or "lower" CIs}
 
-\item{dir}{look above or below the 'use' at the set threshold}
+\item{dir}{look "above" or "below" the 'use' at the set threshold}
 }
 \value{
-Returns a visualistation of a multiverse object
+Returns a visualization of a multiverse object
 }
 \description{
+This function allows the user to plot the output from splithalf_multiverse or testretest_multiverse. The plot includes an upper panel with all reliability estimates (and CIs) and a lower panel that indicates the data processing specifications corresponding to that reliability estimate.
 The (unofficial) function version name is "This function will make you a master in bird law"
 
+This function examines the output from splithalf_multiverse or testretest_multiverse to extract the proportions of estimates above or below a set threshold (can be the estimate or the upper or lower CI estimates).
 The (unofficial) function version name is "This function will get you up to here with it"
 }
 \examples{
+\dontrun{
 ## see online documentation for examples
+https://github.com/sdparsons/splithalf
+## also see https://psyarxiv.com/y6tcz
+
+## example simulated data
+n_participants = 60 ## sample size
+n_trials = 80
+n_blocks = 2
+sim_data <- data.frame(participant_number = rep(1:n_participants,
+                       each = n_blocks * n_trials),
+                       trial_number = rep(1:n_trials,
+                       times = n_blocks * n_participants),
+                       block_name = rep(c("A","B"),
+                       each = n_trials,
+                       length.out = n_participants * n_trials * n_blocks),
+                       trial_type = rep(c("congruent","incongruent"),
+                       length.out = n_participants * n_trials * n_blocks),
+                       RT = rnorm(n_participants * n_trials * n_blocks,
+                       500,
+                       200),
+                       ACC = 1)
+
+## specify several data processing decisions
+specifications <- list(RT_min = c(0, 100, 200),
+                       RT_max = c(1000, 2000),
+                       averaging_method = c("mean", "median"))
+## run splithalf, and save the output
+difference <- splithalf(data = sim_data,
+                        outcome = "RT",
+                        score = "difference",
+                        conditionlist = c("A"),
+                        halftype = "random",
+                        permutations = 5000,
+                        var.RT = "RT",
+                        var.condition = "block_name",
+                        var.participant = "participant_number",
+                        var.compare = "trial_type",
+                        var.ACC = "ACC",
+                        compare1 = "congruent",
+                        compare2 = "incongruent",
+                        average = "mean")
+
+## run splithalf.multiverse to perform the multiverse of data processing
+## and reliability estimation
+multiverse <- splithalf.multiverse(input = difference,
+                                   specifications = specifications)
+
+## can be plot with:
+multiverse.plot(multiverse = multiverse,
+                title = "README multiverse")
+
+}
+\dontrun{
+## see online documentation for examples
+https://github.com/sdparsons/splithalf
+## also see https://psyarxiv.com/y6tcz
+
+## example simulated data
+n_participants = 60 ## sample size
+n_trials = 80
+n_blocks = 2
+sim_data <- data.frame(participant_number = rep(1:n_participants,
+                       each = n_blocks * n_trials),
+                       trial_number = rep(1:n_trials,
+                       times = n_blocks * n_participants),
+                       block_name = rep(c("A","B"),
+                       each = n_trials,
+                       length.out = n_participants * n_trials * n_blocks),
+                       trial_type = rep(c("congruent","incongruent"),
+                       length.out = n_participants * n_trials * n_blocks),
+                       RT = rnorm(n_participants * n_trials * n_blocks,
+                       500,
+                       200),
+                       ACC = 1)
+
+## specify several data processing decisions
+specifications <- list(RT_min = c(0, 100, 200),
+                       RT_max = c(1000, 2000),
+                       averaging_method = c("mean", "median"))
+## run splithalf, and save the output
+difference <- splithalf(data = sim_data,
+                        outcome = "RT",
+                        score = "difference",
+                        conditionlist = c("A"),
+                        halftype = "random",
+                        permutations = 5000,
+                        var.RT = "RT",
+                        var.condition = "block_name",
+                        var.participant = "participant_number",
+                        var.compare = "trial_type",
+                        var.ACC = "ACC",
+                        compare1 = "congruent",
+                        compare2 = "incongruent",
+                        average = "mean")
+
+## run splithalf.multiverse to perform the multiverse of data processing
+## and reliability estimation
+multiverse <- splithalf.multiverse(input = difference,
+                                   specifications = specifications)
+
+
+## the threshold function can be used to return the number of estimates
+## above or below a certain threshold
+
+threshold(multiverse = multiverse,
+          threshold = 0.7,
+          use = "estimate",
+          dir = "above")
+}
 }
